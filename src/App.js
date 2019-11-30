@@ -131,7 +131,7 @@ function App(props) {
       {/* </Link> */}
       {/* <Link to="/cart" className={classes.anchor}> */}
       <IconButton color="primary" onClick={()=>window.location.href = '/cart'}>
-      <Badge badgeContent={state.cart.length} color="secondary">
+      <Badge badgeContent={state.cartItems.length} color="secondary">
       <FaShoppingCart />
       </Badge>
       </IconButton>
@@ -149,9 +149,12 @@ function App(props) {
           <IconButton color="primary" onClick={()=>window.location.href = '/user-profile'}>
           <IoIosPerson />
           </IconButton>
+          <Button color="primary" className="font" onClick={()=>window.location.href = '/myorder'}>
+      Orders
+      </Button>
           {/* </Link> */}
           <IconButton color="primary" onClick={()=>window.location.href = '/cart'}>
-      <Badge badgeContent={state.cart.length} color="secondary">
+      <Badge badgeContent={state.cartItems.length} color="secondary">
       <FaShoppingCart />
       </Badge>
       </IconButton>

@@ -3,6 +3,8 @@ import { Switch, Route } from "react-router-dom";
 import Login from "../Website/Login";
 import Home from "../Website/Home";
 import Cart from "../Website/Cart";
+import OrderPlaced from "../Website/OrderPlaced";
+import MyOrder from "../Website/MyOrder";
 import Register from "./Register";
 import SellerDashboard from "./privateComponents/SellerDashboard";
 import AdminDashboard from "./privateComponents/AdminDashboard";
@@ -32,6 +34,12 @@ function MainRoute() {
       </Switch>
       <Switch>
       <PrivateRouteUser exact path="/user-profile" component={UserProfile} />
+      </Switch>
+      <Switch>
+      <PrivateRouteUser exact path="/payment-complete" component={OrderPlaced} />
+      </Switch>
+      <Switch>
+      <PrivateRouteUser exact path="/myorder" component={MyOrder} />
       </Switch>
 
     </div>

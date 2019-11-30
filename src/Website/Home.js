@@ -108,7 +108,7 @@ export default function Home() {
   const [snakeData, setSnakeData] = useState({ open: false, message: "" });
   // const { setItem } = useContext(CartContext);
   const addToCart =async id => {
-    const existInCart = await state.cart.find(f=> f._id === id);
+    const existInCart = await state.cartItems.find(f=> f._id === id);
     if(existInCart){
       return setSnakeData({ open: true, message: "Already in Cart" });
 

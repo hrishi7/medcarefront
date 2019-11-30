@@ -5,6 +5,9 @@ import { FaMapMarkerAlt, FaTrashAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import {useDispatch,useSelector} from 'react-redux'
 import { removeFromCartAction } from "../redux";
+import jwt_decode from 'jwt-decode';
+import axios from 'axios'
+
 const useStyles = makeStyles(theme => ({
   cart: {
     padding: "10px"
@@ -19,24 +22,33 @@ const useStyles = makeStyles(theme => ({
 export default function Cart() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  let state = useSelector(state=>state)
-  useEffect(() => {
-    totalSum();
-  }, [state.cart]);
-  const [itemPrice, setItemPrice] = useState(0);
-  const [deliveryFee, setDeliveryFee] = useState(50);
-  const [total, setTotal] = useState(0);
+  let state = useSelector(state=>state);
 
-  const totalSum = () => {
+  useEffect(()=>{totalSum()},[state]);
+
+  const [itemPrice, setItemPrice] = useState(0);
+  const [deliveryFee, setDeliveryFee] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [deliverylocation, setDeliveryLocation] = useState('45, Tollygunge, Kolkata-40');
+
+  const totalSum = async() => {
     let price = 0;
-    let item = state.cart;
-    item.map(i => (price += +i.discountedPrice));
-    if (price > 500) {
-      setDeliveryFee(0);
-    }
-    setItemPrice(price);
-    setTotal(price + deliveryFee);
+    let items = state.cartItems;
+    items.forEach((element,i) => {
+      price += +element.discountedPrice;
+      if(i == items.length - 1){
+        if( +price < 1000){
+          setDeliveryFee(50);
+          setItemPrice(price);
+          setTotal(itemPrice + deliveryFee)
+        }else{
+          setItemPrice(price);
+          setTotal(price + deliveryFee)
+        }
+      }
+    });
   };
+
   const handleRemove = (id, j) => {
     if (id) {
       dispatch(removeFromCartAction(id))
@@ -44,7 +56,28 @@ export default function Cart() {
   };
 
   const handleOrder = ()=>{
-    alert('Ordered');
+    if(state.user.token !== "" && state.user.role === "user"){
+      let user = jwt_decode(state.user.token);
+      let paymentData = {
+        items:state.cartItems,
+        deliveryLocation:deliverylocation,
+        purpose: "Purchase Medicine",
+        amount: itemPrice + deliveryFee,
+        buyer_name: user.name ,
+        email: user.email,
+        phone: user.mobile,
+        redirect_url: `http://localhost:5000/api/v1/payment/callback?user_id=${user.id}&user_email=${user.email}`,
+        webhook_url: '/webhook/',
+      };
+      axios
+        .post("http://localhost:5000/api/v1/payment/pay", paymentData)
+        .then(res => {
+          window.location.href = res.data;
+        })
+        .catch(err => console.log(err));
+    } else{
+      window.location.href = '/login'
+    }
   }
 
   return (
@@ -56,15 +89,15 @@ export default function Cart() {
             <Paper className={classes.cart}>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <Chip variant="outlined" color="primary" label={`My Cart (${state.cart.length})`} />
+                  <Chip variant="outlined" color="primary" label={`My Cart (${state.cartItems.length})`} />
                 </Grid>
                 <Grid item xs={8}>
                   <Typography align="right" color="primary">
-                    <FaMapMarkerAlt /> Deliver to : "45, Tollygunge, Kolkata-40"
+                    <FaMapMarkerAlt /> Deliver to :{`${deliverylocation}`}
                   </Typography>
                 </Grid>
               </Grid>
-              {state.cart.map((i, j) => (
+              {state.cartItems.map((i, j) => (
                 <Grid container spacing={2} key={j}>
                   <Grid item xs={12}>
                     <Divider />
@@ -74,12 +107,7 @@ export default function Cart() {
                   </Grid>
                   <Grid item xs={12} md={7}>
                     <Typography color="primary">{i.name}</Typography>
-                    {/* <Typography color="textPrimary" gutterBottom variant="body2">
-                      {i.subheader}
-                    </Typography> */}
-                    {/* <Typography variant="caption" gutterBottom>
-                      {i.desc}
-                    </Typography> */}
+
                     <Typography variant="body2" color="primary">
                       {`${i.discountPercent} % Off`}
                     </Typography>
@@ -89,8 +117,7 @@ export default function Cart() {
                     </IconButton>
                   </Grid>
                   <Grid item xs={12} md={3}>
-                    {/* <Typography variant="body2"> Delivered till 30 December 19</Typography> */}
-                    <Typography variant="caption"> 10 Days of Replacement</Typography>
+                      <Typography variant="caption"> 10 Days of Replacement</Typography>
                   </Grid>
                 </Grid>
               ))}
@@ -110,7 +137,7 @@ export default function Cart() {
               <br />
               <Grid container>
                 <Grid item xs={6}>
-                  <Typography color="primary">Subtotal ({state.cart.length} item) :</Typography>
+                  <Typography color="primary">Subtotal ({state.cartItems.length} item) :</Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography align="right" color="secondary">
@@ -122,7 +149,8 @@ export default function Cart() {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography align="right" color="secondary">
-                    {`₹ ${deliveryFee}`}
+                    { console.log(deliveryFee),
+                    `₹ ${deliveryFee}`}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -135,7 +163,7 @@ export default function Cart() {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography align="right" color="secondary">
-                    {`₹ ${total}`}
+                    {`₹ ${itemPrice + deliveryFee}`}
                   </Typography>
                 </Grid>
               </Grid>

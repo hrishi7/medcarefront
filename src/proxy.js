@@ -1,1 +1,1 @@
-export const proxy = "https://medcareback.herokuapp.com"
+export const proxy = "http://localhost:5000"

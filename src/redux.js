@@ -4,7 +4,7 @@ import  { createStore } from 'redux';
 //initalize the initail state
 const initialState = {
     products:[],
-    cart:[],
+    cartItems:[],
     orders:[],
     isAuthenticated:false,
     user:{
@@ -82,12 +82,22 @@ function reducer(state=initialState, action){
         case 'ADD_TO_CART':
             return{
                 ...state,
-                cart:[...state.cart,action.payload]
+                cartItems:[...state.cartItems,action.payload],
             }
         case 'REMOVE_FROM_CART':
             return{
                 ...state,
-                cart: state.cart.filter((item) => item._id !== action.payload)
+                cartItems: state.cartItems.filter((item) => item._id !== action.payload)
+            }
+        case 'CLEAR_CART':
+            return{
+                ...state,
+                cartItems:[]
+            }
+        case 'GET_ORDERS':
+            return{
+                ...state,
+                orders:action.payload
             }
         default:
             return state;
@@ -124,4 +134,14 @@ export const addToCartAction = (obj) =>({
 export const removeFromCartAction = (id) =>({
     type:'REMOVE_FROM_CART',
     payload:id
+})
+
+export const clearCartAction = () =>({
+    type:'CLEAR_CART',
+    payload:{}
+})
+
+export const getOrdersAction = (orders) =>({
+    type:'GET_ORDERS',
+    payload:orders
 })
