@@ -56,6 +56,9 @@ export default function Cart() {
   };
 
   const handleOrder = ()=>{
+    if(itemPrice + deliveryFee <= 0){
+      return alert('Please Add product to cart to order')
+    }
     if(state.user.token !== "" && state.user.role === "user"){
       let user = jwt_decode(state.user.token);
       let paymentData = {
@@ -149,8 +152,7 @@ export default function Cart() {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography align="right" color="secondary">
-                    { console.log(deliveryFee),
-                    `₹ ${deliveryFee}`}
+                    {`₹ ${deliveryFee}`}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>

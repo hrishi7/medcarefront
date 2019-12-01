@@ -149,6 +149,7 @@ function App(props) {
           <IconButton color="primary" onClick={()=>window.location.href = '/user-profile'}>
           <IoIosPerson />
           </IconButton>
+          {/* <Link to="/notification" className={classes.anchor}> */}
           <Button color="primary" className="font" onClick={()=>window.location.href = '/myorder'}>
       Orders
       </Button>
